@@ -14,11 +14,9 @@ class App extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        routes: {
-          '/': (context) => HomePage(
-                title: 'Vehicles',
-                apiManager: apiManager,
-              )
-        });
+        home: HomePage(
+          title: 'Vehicles',
+          apiManager: apiManager,
+        ));
   }
 }

@@ -1,39 +1,50 @@
 import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:vehicle_search/network/api_manager.dart';
-import 'package:vehicle_search/network/vehicle_response.dart';
 import 'package:vehicle_search/presentation/base/base_bloc.dart';
 import 'package:vehicle_search/presentation/home/home_state.dart';
 
 class HomeBloc extends BaseBloc {
-  HomeBloc(this.apiManager) {
-    _initializeVehicles();
+  HomeBloc._(this.onVehiclesRequested, this.state) {
+    reload();
   }
 
-  final ApiManager apiManager;
+  final Sink onVehiclesRequested;
 
-  final _vehiclesSubject = BehaviorSubject<HomeState>();
+  final Stream<HomeState> state;
 
-  List<VehicleManufacturer> _vehicleManufacturers = [];
-
-//  UnmodifiableListView<VehicleManufacturer>
-//  List<VehicleManufacturer>
-  Stream<HomeState> get vehicleManufacturers => _vehiclesSubject.stream;
-
-  Future<VehicleResponse> _getVehicles() async {
-    return apiManager.getVehicles();
+  void reload() {
+    onVehiclesRequested.add(Object());
   }
 
-  Future<Null> _updateVehicleManufacturers() async {
-    final vehicles = await _getVehicles();
-    _vehicleManufacturers = vehicles.results;
+  factory HomeBloc(ApiManager apiManager) {
+    final onVehiclesRequested = BehaviorSubject();
+
+    final state = onVehiclesRequested
+        .switchMap<HomeState>((_) => _getVehicles(apiManager))
+        .startWith(HomeEmpty());
+
+    return HomeBloc._(onVehiclesRequested, state);
   }
 
-  Future<void> _initializeVehicles() async {
-    await _updateVehicleManufacturers();
-    _vehiclesSubject.add(HomePopulated(
-        UnmodifiableListView(_vehicleManufacturers.toSet().toList())));
+  static Stream<HomeState> _getVehicles(ApiManager apiManager) async* {
+    print("Get vehicle");
+    yield HomeLoading();
+
+    try {
+      final result = await apiManager.getVehicles();
+      if (result.results.isNotEmpty) {
+        yield HomePopulated(
+            UnmodifiableListView(result.results.toSet().toList()));
+      } else {
+        yield HomeEmpty();
+      }
+    } catch (e) {
+      yield HomeError();
+    }
+  }
+
+  void dispose() {
+    onVehiclesRequested.close();
   }
 }
-
-

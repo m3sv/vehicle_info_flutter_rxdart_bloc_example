@@ -1,17 +1,20 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:vehicle_search/common/navigation_utils.dart';
 import 'package:vehicle_search/network/vehicle_response.dart';
 import 'package:vehicle_search/presentation/home/home_bloc.dart';
+import 'package:vehicle_search/presentation/home/home_state.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title, @required this.apiManager})
-      : super(key: key);
+  HomePage({Key key, this.title, @required this.apiManager, this.data})
+      : super(key: key) {
+    if (data != null) print(data);
+  }
 
   final apiManager;
   final String title;
+  final Object data;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -46,17 +49,28 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: StreamBuilder<UnmodifiableListView<VehicleManufacturer>>(
-          stream: bloc.vehicleManufacturers,
-          initialData: UnmodifiableListView<VehicleManufacturer>([]),
-          builder: (context, snapshot) => ListView(
-                children: snapshot.data.map(_buildItem).toList(),
-              )), // This trailing comma makes auto-formatting nicer for build methods.
+      body: StreamBuilder<HomeState>(
+          stream: bloc.state,
+          initialData: HomeEmpty(),
+          builder: (context, snapshot) {
+            if (snapshot.data is HomePopulated)
+              return ListView(
+                children: (snapshot.data as HomePopulated)
+                    .result
+                    .map(_buildItem)
+                    .toList(),
+              );
+
+            if (snapshot.data is HomeEmpty) {
+              return GestureDetector(
+                child: Center(child: Text("Empty")),
+                onTap: bloc.reload,
+              );
+            }
+
+            return Center(child: CircularProgressIndicator());
+          }), // This trailing comma makes auto-formatting nicer for build methods.
     );
-  }
-
-  Widget _getPlaceHolder() {
-
   }
 
   Widget _buildItem(VehicleManufacturer manufacturer) {
@@ -97,7 +111,7 @@ class _HomePageState extends State<HomePage> {
               FlatButton(
                 child: Text('additional info'),
                 onPressed: () {
-                  bloc.navigateTo(Screen.DETAILS);
+                  bloc.navigateTo(Details(data: manufacturer.commonName ?? manufacturer.fullName));
                 },
                 textColor: Theme.of(context).primaryColor,
               )
