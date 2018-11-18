@@ -1,19 +1,45 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:vehicle_search/network/vehicle_manufacter.dart';
+import 'package:vehicle_search/common/navigation_utils.dart';
+import 'package:vehicle_search/network/vehicle_response.dart';
 import 'package:vehicle_search/presentation/home/home_bloc.dart';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title, @required this.bloc}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key, this.title, @required this.apiManager})
+      : super(key: key);
 
-  final HomeBloc bloc;
+  final apiManager;
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
+  final padding = const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0);
+
+  StreamSubscription<Screen> navigation;
+
+  HomeBloc bloc;
+
+  @override
+  void initState() {
+    print('Init home state');
+    super.initState();
+    bloc = HomeBloc(widget.apiManager);
+    navigation = bloc.navigation
+        .listen((screen) => NavigationUtils.navigateTo(context, screen));
+  }
+
+  @override
+  void dispose() {
+    print('Disposing');
+    navigation?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,12 +47,16 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: StreamBuilder<UnmodifiableListView<VehicleManufacturer>>(
-          stream: widget.bloc.vehicleManufacturers,
+          stream: bloc.vehicleManufacturers,
           initialData: UnmodifiableListView<VehicleManufacturer>([]),
           builder: (context, snapshot) => ListView(
                 children: snapshot.data.map(_buildItem).toList(),
               )), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget _getPlaceHolder() {
+
   }
 
   Widget _buildItem(VehicleManufacturer manufacturer) {
@@ -41,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
             children: <Widget>[
               Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                  padding: padding,
                   child: Text('Manufacturer id: ${manufacturer.id}')),
             ],
           ),
@@ -49,19 +79,30 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Flexible(
                   child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                      child:
-                      Text('Manufacturer full name: ${manufacturer.fullName}'))
-              )
+                      padding: padding,
+                      child: Text(
+                          'Manufacturer full name: ${manufacturer.fullName}')))
             ],
           ),
           Row(
             children: <Widget>[
               Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                  padding: padding,
                   child: Text('Manufacturer country: ${manufacturer.country}')),
             ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FlatButton(
+                child: Text('additional info'),
+                onPressed: () {
+                  bloc.navigateTo(Screen.DETAILS);
+                },
+                textColor: Theme.of(context).primaryColor,
+              )
+            ],
+          )
         ],
       ),
     );

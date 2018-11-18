@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:vehicle_search/network/vehicle_manufacter.dart';
+import 'package:vehicle_search/network/vehicle_response.dart';
 
 class ApiManager {
   Future<VehicleResponse> getVehicles() async {
