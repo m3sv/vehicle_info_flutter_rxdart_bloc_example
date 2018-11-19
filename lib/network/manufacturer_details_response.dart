@@ -2,7 +2,7 @@ class ManufacturerDetailsResponse {
   int count;
   String message;
   String searchCriteria;
-  List<Results> results;
+  List<ManufacturerDetails> results;
 
   ManufacturerDetailsResponse({this.count, this.message, this.searchCriteria, this.results});
 
@@ -11,15 +11,15 @@ class ManufacturerDetailsResponse {
     message = json['Message'];
     searchCriteria = json['SearchCriteria'];
     if (json['Results'] != null) {
-      results = new List<Results>();
+      results = new List<ManufacturerDetails>();
       json['Results'].forEach((v) {
-        results.add(new Results.fromJson(v));
+        results.add(new ManufacturerDetails.fromJson(v));
       });
     }
   }
 }
 
-class Results {
+class ManufacturerDetails {
   String address;
   String address2;
   String city;
@@ -27,16 +27,16 @@ class Results {
   String contactFax;
   String contactPhone;
   String country;
-  Null dBAs;
+  String dBAs;
   List<Object> equipmentItems;
   String lastUpdated;
   List<ManufacturerTypes> manufacturerTypes;
   String mfrCommonName;
   int mfrID;
   String mfrName;
-  Null otherManufacturerDetails;
+  String otherManufacturerDetails;
   String postalCode;
-  Null primaryProduct;
+  String primaryProduct;
   String principalFirstName;
   String principalLastName;
   String principalPosition;
@@ -46,7 +46,7 @@ class Results {
   String submittedPosition;
   List<VehicleTypes> vehicleTypes;
 
-  Results(
+  ManufacturerDetails(
       {this.address,
       this.address2,
       this.city,
@@ -73,7 +73,7 @@ class Results {
       this.submittedPosition,
       this.vehicleTypes});
 
-  Results.fromJson(Map<String, dynamic> json) {
+  ManufacturerDetails.fromJson(Map<String, dynamic> json) {
     address = json['Address'];
     address2 = json['Address2'];
     city = json['City'];
@@ -83,7 +83,7 @@ class Results {
     country = json['Country'];
     dBAs = json['DBAs'];
     if (json['EquipmentItems'] != null) {
-      equipmentItems = new List<Null>();
+      equipmentItems = new List();
       json['EquipmentItems'].forEach((v) {
         equipmentItems.add(v);
       });
