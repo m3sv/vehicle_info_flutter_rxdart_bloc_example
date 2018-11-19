@@ -45,6 +45,7 @@ class HomeBloc extends BaseBloc {
   }
 
   void dispose() {
+    super.dispose();
     onVehiclesRequested.close();
   }
 }

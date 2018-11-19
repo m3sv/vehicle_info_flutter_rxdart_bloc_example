@@ -7,6 +7,11 @@ abstract class BaseBloc {
   Stream<Screen> get navigation => _navigationSubject;
 
   void navigateTo(Screen screen) {
+    print("Navigate from BLoC to screen: $screen");
     _navigationSubject.add(screen);
+  }
+
+  void dispose() {
+    _navigationSubject.close();
   }
 }

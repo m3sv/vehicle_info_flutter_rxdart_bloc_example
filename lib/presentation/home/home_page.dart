@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:vehicle_search/common/navigation_utils.dart';
 import 'package:vehicle_search/network/vehicle_response.dart';
+import 'package:vehicle_search/presentation/base/navigation_state.dart';
 import 'package:vehicle_search/presentation/home/home_bloc.dart';
 import 'package:vehicle_search/presentation/home/home_state.dart';
 
@@ -20,27 +19,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends NavigationState<HomePage, HomeBloc> {
   final padding = const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0);
-
-  StreamSubscription<Screen> navigation;
-
-  HomeBloc bloc;
 
   @override
   void initState() {
-    print('Init home state');
-    super.initState();
     bloc = HomeBloc(widget.apiManager);
-    navigation = bloc.navigation
-        .listen((screen) => NavigationUtils.navigateTo(context, screen));
-  }
-
-  @override
-  void dispose() {
-    print('Disposing');
-    navigation?.cancel();
-    super.dispose();
+    super.initState();
   }
 
   @override
@@ -111,7 +96,8 @@ class _HomePageState extends State<HomePage> {
               FlatButton(
                 child: Text('additional info'),
                 onPressed: () {
-                  bloc.navigateTo(Details(data: manufacturer.commonName ?? manufacturer.fullName));
+                  bloc.navigateTo(Details(
+                      data: manufacturer.commonName ?? manufacturer.fullName));
                 },
                 textColor: Theme.of(context).primaryColor,
               )
