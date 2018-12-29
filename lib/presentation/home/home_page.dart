@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vehicle_search/common/injector.dart';
 import 'package:vehicle_search/common/navigation_utils.dart';
 import 'package:vehicle_search/network/vehicle_response.dart';
 import 'package:vehicle_search/presentation/base/navigation_state.dart';
@@ -6,12 +7,8 @@ import 'package:vehicle_search/presentation/home/home_bloc.dart';
 import 'package:vehicle_search/presentation/home/home_state.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title, @required this.apiManager, this.data})
-      : super(key: key) {
-    if (data != null) print(data);
-  }
+  HomePage({Key key, this.title, this.data}) : super(key: key);
 
-  final apiManager;
   final String title;
   final Object data;
 
@@ -24,7 +21,7 @@ class _HomePageState extends NavigationState<HomePage, HomeBloc> {
 
   @override
   void initState() {
-    bloc = HomeBloc(widget.apiManager);
+    bloc = HomeBloc(Injector.getApiManager());
     super.initState();
   }
 
@@ -58,6 +55,9 @@ class _HomePageState extends NavigationState<HomePage, HomeBloc> {
     );
   }
 
+  Padding _createLabel(String text) =>
+      Padding(padding: padding, child: Text(text));
+
   Widget _buildItem(VehicleManufacturer manufacturer) {
     return Padding(
       key: PageStorageKey(manufacturer.id),
@@ -69,25 +69,19 @@ class _HomePageState extends NavigationState<HomePage, HomeBloc> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Padding(
-                  padding: padding,
-                  child: Text('Manufacturer id: ${manufacturer.id}')),
+              _createLabel('Manufacturer id: ${manufacturer.id}'),
             ],
           ),
           Row(
             children: <Widget>[
               Flexible(
-                  child: Padding(
-                      padding: padding,
-                      child: Text(
-                          'Manufacturer full name: ${manufacturer.fullName}')))
+                  child: _createLabel(
+                      'Manufacturer full name: ${manufacturer.fullName}'))
             ],
           ),
           Row(
             children: <Widget>[
-              Padding(
-                  padding: padding,
-                  child: Text('Manufacturer country: ${manufacturer.country}')),
+              _createLabel('Manufacturer country: ${manufacturer.country}')
             ],
           ),
           Row(

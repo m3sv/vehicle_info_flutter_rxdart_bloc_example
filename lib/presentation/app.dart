@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:vehicle_search/network/api_manager.dart';
 import 'package:vehicle_search/presentation/home/home_page.dart';
 
 class App extends StatelessWidget {
-  final ApiManager apiManager;
-
-  App({this.apiManager});
+  App();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +13,6 @@ class App extends StatelessWidget {
         ),
         home: HomePage(
           title: 'Vehicles',
-          apiManager: apiManager,
         ));
   }
 }

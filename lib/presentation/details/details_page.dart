@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:vehicle_search/common/injector.dart';
 import 'package:vehicle_search/network/manufacturer_details_response.dart';
 import 'package:vehicle_search/presentation/base/navigation_state.dart';
 import 'package:vehicle_search/presentation/details/details_bloc.dart';
 import 'package:vehicle_search/presentation/details/details_state.dart';
 
 class DetailsPage extends StatefulWidget {
-  DetailsPage({Key key, this.title, @required this.apiManager, this.data})
-      : super(key: key) {
+  DetailsPage({Key key, this.title, this.data}) : super(key: key) {
     if (data != null) print(data);
   }
 
-  final apiManager;
   final String title;
   final Object data;
 
@@ -23,7 +22,7 @@ class _DetailsState extends NavigationState<DetailsPage, DetailsBloc> {
 
   @override
   void initState() {
-    bloc = DetailsBloc(widget.apiManager, widget.data);
+    bloc = DetailsBloc(Injector.getApiManager(), widget.data);
     super.initState();
   }
 
@@ -62,47 +61,25 @@ class _DetailsState extends NavigationState<DetailsPage, DetailsBloc> {
     );
   }
 
+  Row _createRow(String text) => Row(
+        children: <Widget>[
+          Padding(padding: padding, child: Text(text)),
+        ],
+      );
+
   Widget _buildItem(ManufacturerDetails manufacturer) {
     return Padding(
       key: PageStorageKey(manufacturer.mfrID),
       padding: const EdgeInsets.all(16.0),
       child: ExpansionTile(
-        initiallyExpanded: true,
         title: Text(manufacturer.country ?? 'Unknown country',
             style: TextStyle(fontSize: 24.0)),
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Padding(
-                  padding: padding,
-                  child: Text('Manufacturer city: ${manufacturer.city}')),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Flexible(
-                  child: Padding(
-                      padding: padding,
-                      child: Text(
-                          'Manufacturer address: ${manufacturer.address ?? "-"} ')))
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Padding(
-                  padding: padding,
-                  child: Text(
-                      'Manufacturer email: ${manufacturer.contactEmail ?? "-"}')),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Padding(
-                  padding: padding,
-                  child: Text(
-                      'Manufacturer phone: ${manufacturer.contactPhone ?? "-"} ')),
-            ],
-          ),
+          _createRow('Manufacturer city: ${manufacturer.city}'),
+          _createRow('Manufacturer address: ${manufacturer.address ?? "-"} '),
+          _createRow('Manufacturer email: ${manufacturer.contactEmail ?? "-"}'),
+          _createRow(
+              'Manufacturer phone: ${manufacturer.contactPhone ?? "-"} '),
         ],
       ),
     );
